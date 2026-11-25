@@ -105,8 +105,8 @@ def format_price(value: float) -> str:
 
 def get_default_api_key() -> str:
     try:
-        return st.secrets.get("GEMINI_API_KEY", "")
-    except st.errors.StreamlitSecretNotFoundError:
+        return st.secrets["GEMINI_API_KEY"]
+    except (KeyError, st.errors.StreamlitSecretNotFoundError):
         return ""
 
 
@@ -118,7 +118,12 @@ with st.sidebar:
         placeholder="AIza…",
         help="Utilisée uniquement pour les requêtes de cette session.",
     )
-    api_key = api_key_override or get_default_api_key()
+    if api_key_override:
+        api_key = api_key_override
+    else:
+        api_key = get_default_api_key()
+        if api_key:
+            st.success("Clé API active (serveur)")
     selected_model = st.selectbox(
         "Modèle Gemini",
         options=[
