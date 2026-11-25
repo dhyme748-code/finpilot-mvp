@@ -103,14 +103,22 @@ def format_price(value: float) -> str:
     return f"${value:,.2f}"
 
 
+def get_default_api_key() -> str:
+    try:
+        return st.secrets.get("GEMINI_API_KEY", "")
+    except st.errors.StreamlitSecretNotFoundError:
+        return ""
+
+
 with st.sidebar:
     st.markdown("## ⚙️ Configuration")
-    api_key = st.text_input(
+    api_key_override = st.text_input(
         "Clé API Gemini",
         type="password",
         placeholder="AIza…",
         help="Utilisée uniquement pour les requêtes de cette session.",
     )
+    api_key = api_key_override or get_default_api_key()
     selected_model = st.selectbox(
         "Modèle Gemini",
         options=[
